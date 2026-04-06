@@ -1,5 +1,7 @@
 package com.codewithpcodes.salima.user;
 
+import com.codewithpcodes.salima.claim.Claim;
+import com.codewithpcodes.salima.subscription.Subscription;
 import com.codewithpcodes.salima.token.Token;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,6 +43,12 @@ public class User implements UserDetails {
 
     private String nationalId;
     private Boolean isVerified;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Claim> claims;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Subscription> subscriptions;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
