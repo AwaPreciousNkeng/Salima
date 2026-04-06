@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -38,11 +39,21 @@ public class User implements UserDetails {
     @Column
     private String profilePicturePath;
 
-    @Column
+    @Column(nullable = false)
     private String phoneNumber;
+
+    @Column(nullable = false)
+    private LocalDate dateOfBirth;
 
     private String nationalId;
     private Boolean isVerified;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    private String street;
+    private String city;
+    private String region;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Claim> claims;
@@ -74,4 +85,7 @@ public class User implements UserDetails {
         return email;
     }
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }
