@@ -1,0 +1,35 @@
+package com.codewithpcodes.salima.file;
+
+import com.codewithpcodes.salima.user.User;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/v1/files")
+@RequiredArgsConstructor
+@Tag(name = "File Management", description = "File Management Endpoints")
+public class FileController {
+    private final FileService fileService;
+
+    @PostMapping(
+            value = "/upload/profile-picture",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<Map<String, String>> uploadProfilePicture(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        String filePath = fileService.saveProfilePicture(file, currentUser.getId());
+        return ResponseEntity.ok(Map.of("filePath", filePath));
+    }
+}
