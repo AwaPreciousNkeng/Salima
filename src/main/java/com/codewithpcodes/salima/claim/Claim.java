@@ -2,12 +2,14 @@ package com.codewithpcodes.salima.claim;
 
 import com.codewithpcodes.salima.fraud.FraudScore;
 import com.codewithpcodes.salima.payment.Payout;
+import com.codewithpcodes.salima.provider.Provider;
 import com.codewithpcodes.salima.subscription.Subscription;
 import com.codewithpcodes.salima.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -27,8 +29,15 @@ public class Claim {
 
     private BigDecimal amountRequested;
 
+    private BigDecimal amountApproved;
+
     @Enumerated(EnumType.STRING)
-    private Status claimStatus;
+    private ClaimStatus claimStatus;
+
+    private String description;
+    private LocalDate treatmentDate;
+    private LocalDateTime processedAt;
+
 
     @OneToMany(mappedBy = "claim", cascade = CascadeType.ALL)
     private List<ClaimDocument> documents;
@@ -42,7 +51,7 @@ public class Claim {
     private Subscription subscription;
 
     @OneToOne(fetch = FetchType.LAZY)
-    private FraudScore fraudScore;
+    private Provider provider;
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<Payout> payout;

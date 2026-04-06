@@ -1,6 +1,6 @@
 package com.codewithpcodes.salima.claim;
 
-public enum Status {
+public enum ClaimStatus {
     PENDING,
     APPROVED,
     REJECTED
