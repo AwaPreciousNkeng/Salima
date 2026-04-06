@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
-    Optional<Subscription> findByUserIdAndStatus(
+    Optional<Subscription> findByUserIdAndSubscriptionStatus(
             UUID userId,
             SubscriptionStatus status
     );
@@ -26,5 +26,5 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
             "and s.paymentRetryCount < 3")
     List<Subscription> findPendingRetries();
 
-    boolean existsByUserIdAndStatus(UUID userId, SubscriptionStatus status);
+    boolean existsByUserIdAndSubscriptionStatus(UUID userId, SubscriptionStatus status);
 }

@@ -171,6 +171,8 @@ public class AuthenticationService {
                 .lastName(request.lastName())
                 .password(passwordEncoder.encode(request.password()))
                 .email(request.email())
+                .phoneNumber(request.phoneNumber())
+                .dateOfBirth(request.dateOfBirth())
                 .role(Role.ADMIN)
                 .profilePicturePath(defaultProfilePicture)
                 .isVerified(true)

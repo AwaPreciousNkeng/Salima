@@ -36,17 +36,13 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column
     private String profilePicturePath;
-
-    @Column(nullable = false)
     private String phoneNumber;
-    
-    @Column(nullable = false)
     private LocalDate dateOfBirth;
 
     private String nationalId;
-    private Boolean isVerified;
+    @Builder.Default
+    private Boolean isVerified = true;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -67,8 +63,6 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Token> tokens;
-
-    @CreatedBy
 
     @Override
     public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {

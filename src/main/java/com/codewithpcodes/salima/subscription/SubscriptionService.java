@@ -27,7 +27,7 @@ public class SubscriptionService {
             User user
     ) {
         //1. Check if the user has an active subscription
-        if (subscriptionRepository.existsByUserIdAndStatus(user.getId(), SubscriptionStatus.ACTIVE)) {
+        if (subscriptionRepository.existsByUserIdAndSubscriptionStatus(user.getId(), SubscriptionStatus.ACTIVE)) {
             throw new IllegalStateException("User already has an active subscription");
         }
 
@@ -102,7 +102,7 @@ public class SubscriptionService {
     }
 
     private Subscription getActiveSubscription(UUID userId) {
-        return subscriptionRepository.findByUserIdAndStatus(userId, SubscriptionStatus.ACTIVE)
+        return subscriptionRepository.findByUserIdAndSubscriptionStatus(userId, SubscriptionStatus.ACTIVE)
                 .orElseThrow(() -> new IllegalStateException("User does not have an active subscription"));
     }
 

@@ -2,6 +2,7 @@ package com.codewithpcodes.salima.claim;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public record ClaimResponse(
         BigDecimal amountApproved,
         ClaimStatus claimStatus,
         String description,
-        LocalDateTime treatmentDate,
+        LocalDate treatmentDate,
         LocalDateTime submittedAt,
         LocalDateTime processedAt
 ) {
