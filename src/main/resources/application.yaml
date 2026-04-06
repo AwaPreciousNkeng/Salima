@@ -1,3 +1,33 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/salima_db
+    username: pcodes
+    password: pcodes
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: PostgreSQL
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      max-file-size: 50MB
+springdoc:
+  default-produces-media-type: application/json
+application:
+  file:
+    uploads:
+      media-output-path: ./uploads
+  security:
+    jwt:
+      secret: 4LsujF2wsA4Q9XMHZCl7dAXG+2UFSaU24kbJIWpooQE=
+      expiration: 86400000 #1 day
+      refresh-token:
+        expiration: 604800000 #7 days
   application:
     name: Salima
+
