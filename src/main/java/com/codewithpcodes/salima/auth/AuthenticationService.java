@@ -191,4 +191,24 @@ public class AuthenticationService {
                 .gender(savedAdmin.getGender())
                 .build();
     }
+
+    public void ForgotPassword(ForgottenPasswordRequest request) {
+        //1. Check the user exists
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + request.email()));
+
+        //2. Compare the two passwords to see if they match
+        if (!request.newPassword().equals(request.confirmNewPassword())) {
+            throw new IllegalArgumentException("New passwords do not match");
+        }
+
+        //3. Update the user's password'
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        //4. Revoke the user token to force them to authenticate again
+        revokeAllUserTokens(user);
+
+        log.info("Password reset for user {}", user.getEmail());
+    }
 }
