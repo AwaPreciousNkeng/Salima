@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -50,6 +51,9 @@ public class User implements UserDetails {
     private String street;
     private String city;
     private String region;
+    
+    private String resetPasswordCode;
+    private LocalDateTime resetPasswordCodeExpiry;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Claim> claims;

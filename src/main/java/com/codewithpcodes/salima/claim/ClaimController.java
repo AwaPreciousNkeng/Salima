@@ -48,7 +48,8 @@ public class ClaimController {
 
     @GetMapping("/subscriptions/{subscriptionId}")
     public ResponseEntity<List<ClaimResponse>> getClaimsBySubscription(
-            @PathVariable UUID subscriptionId
+            @PathVariable UUID subscriptionId,
+            @AuthenticationPrincipal User currentUser
     ) {
         return ResponseEntity.ok(claimService.getClaimsBySubscriptionId(subscriptionId));
     }

@@ -1,5 +1,8 @@
 package com.codewithpcodes.salima.auth;
 
+import com.codewithpcodes.salima.notification.EmailNotificationRequest;
+import com.codewithpcodes.salima.notification.EmailTemplate;
+import com.codewithpcodes.salima.notification.NotificationService;
 import com.codewithpcodes.salima.config.JwtService;
 import com.codewithpcodes.salima.token.Token;
 import com.codewithpcodes.salima.token.TokenRepository;
@@ -21,6 +24,9 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -30,8 +36,9 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
 
     public void register(RegistrationRequest request) {
 
@@ -192,23 +199,74 @@ public class AuthenticationService {
                 .build();
     }
 
-    public void ForgotPassword(ForgottenPasswordRequest request) {
+    public void forgotPassword(ForgottenPasswordRequest request) {
         //1. Check the user exists
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + request.email()));
 
-        //2. Compare the two passwords to see if they match
-        if (!request.newPassword().equals(request.confirmNewPassword())) {
-            throw new IllegalArgumentException("New passwords do not match");
-        }
+        // 2. Generate a secure, short-lived confirmation code
+        String confirmationCode = String.format("%06d", new Random().nextInt(1000000));
 
-        //3. Update the user's password'
-        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        // 3. Save the code and expiry time
+        user.setResetPasswordCode(confirmationCode);
+        user.setResetPasswordCodeExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
 
-        //4. Revoke the user token to force them to authenticate again
-        revokeAllUserTokens(user);
+        // 4. Send it to the user's email using the template
+        EmailNotificationRequest emailRequest = EmailNotificationRequest.builder()
+                .to(user.getEmail())
+                .subject(EmailTemplate.RESET_PASSWORD.getSubject())
+                .templateName(EmailTemplate.RESET_PASSWORD.getTemplate())
+                .templateModel(Map.of(
+                        "username", user.getFullName(),
+                        "confirmationCode", confirmationCode
+                ))
+                .build();
 
-        log.info("Password reset for user {}", user.getEmail());
+        notificationService.sendEmail(emailRequest);
+        log.info("Password reset email initiated for user {}", user.getEmail());
     }
+
+    public void verifyResetCode(VerifyResetCodeRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + request.email()));
+
+        if (user.getResetPasswordCode() == null || !user.getResetPasswordCode().equals(request.code())) {
+            throw new IllegalArgumentException("Invalid confirmation code");
+        }
+
+        if (user.getResetPasswordCodeExpiry() == null || user.getResetPasswordCodeExpiry().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Confirmation code has expired");
+        }
+        
+        log.info("Reset code verified for user {}", user.getEmail());
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + request.email()));
+
+        // 1. Verify the code again to be sure
+        verifyResetCode(new VerifyResetCodeRequest(request.email(), request.code()));
+
+        // 2. Validate passwords match
+        if (!request.newPassword().equals(request.confirmNewPassword())) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+
+        // 3. Update password
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        
+        // 4. Clear the reset code
+        user.setResetPasswordCode(null);
+        user.setResetPasswordCodeExpiry(null);
+        
+        userRepository.save(user);
+
+        // 5. Revoke all tokens
+        revokeAllUserTokens(user);
+        
+        log.info("Password reset successfully for user {}", user.getEmail());
+    }
+
 }

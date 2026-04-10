@@ -16,6 +16,17 @@ spring:
   servlet:
     multipart:
       max-file-size: 50MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: pcodes
+    password: pcodes
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 springdoc:
   default-produces-media-type: application/json
 application:

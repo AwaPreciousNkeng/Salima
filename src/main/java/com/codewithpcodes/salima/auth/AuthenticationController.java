@@ -1,5 +1,6 @@
 package com.codewithpcodes.salima.auth;
 
+import com.codewithpcodes.salima.user.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -56,10 +58,26 @@ public class AuthenticationController {
     }
 
     @PatchMapping("/forgot-password")
-    public ResponseEntity<Void> refreshToken(
+    public ResponseEntity<Void> forgotPassword(
             @Valid @RequestBody ForgottenPasswordRequest request
     ) {
-        service.ForgotPassword(request);
+        service.forgotPassword(request);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/verify-reset-code")
+    public ResponseEntity<Void> verifyResetCode(
+            @Valid @RequestBody VerifyResetCodeRequest request
+    ) {
+        service.verifyResetCode(request);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request
+    ) {
+        service.resetPassword(request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
